@@ -1,0 +1,16 @@
+version: '3'  ###//Indicamos la version del docker-compose que vamos a utilizar
+services: ### //dentro de los servicios definimos lo que vamos a utilizar, por ahora solo tenemos uno pero la idea es que creemos otros microservicios
+  ### Posgres database for crude
+  db-crud:
+    container_name: db-crud
+    image: postgres:15.2
+    restart: unless-stopped
+    environment:  ###//aca definimos las variables de entorno que se pasaran al contenedor
+      POSTGRES_DB: ms_crud
+      POSTGRES_USER: java
+      POSTGRES_PASSWORD: java123
+    ports:   ###//mapeamos los puertos del conteneodr al host
+      - 5431:5431
+    expose:  ###exponemos los puertos del contenedor a otros contenedores de la misma red, en este caso 5431
+      - 5431
+    command: -p 5431
