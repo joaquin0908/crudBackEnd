@@ -40,7 +40,7 @@ public class productController {
     }
     //metodo delete
     @DeleteMapping("/{productId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void deleteProduct(@PathVariable Long productId) {
         System.out.println(productId);
         this.productService.deleteProduct(productId);

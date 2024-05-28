@@ -1,45 +1,66 @@
 package com.ucc.crudservice.service;
 
-import com.ucc.crudservice.repositories.productRepository;
-import com.ucc.crudservice.model.Product;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
+import com.ucc.crudservice.model.Product;
+import com.ucc.crudservice.repositories.productRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-
-
 public class productService {
 
     private final productRepository productRepository;
 
-    //metodo para crear producto
-    public List<Product> getProducts(){
-        return  productRepository.findAll();
+    //Metodo para obtener los product
+    public List<Product> getProducts (){
+        return productRepository.findAll();
     }
 
-    //metodo para crear un producto
-    public void addProduct (Product product){
+    //Metodo para crear un product
+
+    public ResponseEntity<Object> addProduct (Product product){
+        HashMap<String, Object> data = new HashMap<>();
         productRepository.save(product);
+        data.put("data", product);
+        data.put("message","Successfully saved");
+        return new ResponseEntity<>(
+                data,
+                HttpStatus.CREATED
+        );
     }
-    //metodo para borrar un producto
-    @DeleteMapping
-    public void deleteProduct(Long id) {
+
+    //Metodo para borrar product
+    public ResponseEntity<Object> deleteProduct (Long id){
         productRepository.deleteById(id);
+        return new ResponseEntity<>("Product delete successfully", HttpStatus.OK);
     }
-    //metodo para actualizar
-    public void updateProduct(Long productId, Product updatedProduct) {
-        Optional<Product> optionalProduct = productRepository.findById(productId);
-        if (optionalProduct.isPresent()) {
-            Product product = optionalProduct.get();
-            product.setName(updatedProduct.getName());
-            product.setPrice(updatedProduct.getPrice());
-            // Actualiza otros campos según sea necesario
-            productRepository.save(product);
+
+    //Metodo para actualizar product
+    public ResponseEntity<Object> updateProduct(Long id, Product updatedProduct) {
+        Optional<Product> existingProductOptional = productRepository.findById(id);
+
+        if (existingProductOptional.isPresent()) {
+            Product existingProduct = existingProductOptional.get();
+
+            existingProduct.setSku(updatedProduct.getSku());
+            existingProduct.setName(updatedProduct.getName());
+            existingProduct.setDescription(updatedProduct.getDescription());
+            existingProduct.setPrice(updatedProduct.getPrice());
+            existingProduct.setStatus(updatedProduct.getStatus());
+
+
+            productRepository.save(existingProduct);
+
+            return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
         }
     }
 }
